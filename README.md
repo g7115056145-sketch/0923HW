@@ -4,34 +4,32 @@
 
 ---
 
-## 📌 技術架構與特色
+## 📌 技術架構與特色亮點
 
-- **API 資料擷取（步驟 3~6）**：使用 Python `requests` 串接中央氣象署未來一週天氣預報 API（`F-C0032-003`），解析 JSON 結構並提取全台各大分區最高溫（`MaxT`）與最低溫（`MinT`）。
-- **資料清洗與結構化（步驟 7）**：使用 `pandas` 整理時間序列資料與計算日溫差、平均溫。
+- **API 資料擷取（步驟 3~6）**：
+  - 使用 Python `requests` 串接中央氣象署未來一週天氣預報 API：
+    - `F-C0032-003`：全台主要分區預報（北部、中部、南部、東北部、東部、東南部、離島等）。
+    - `F-C0032-005`：全台 22 縣市細緻逐日預報與天氣現象描述（`Wx`）。
+- **資料清洗與結構化（步驟 7）**：使用 `pandas` 整理時間序列資料，計算日溫差與每日平均溫。
 - **SQLite 資料庫儲存（步驟 8~10、步驟 20）**：
-  - 建立 `data.db` 資料庫與 `TemperatureForecasts` 資料表。
-  - 設計 `UNIQUE(regionName, dataDate)` 約束與 `INSERT OR REPLACE` 機制，確保重複執行時不重複插入資料。
-  - 內建 SQL 驗證查詢。
-- **Streamlit 視覺化 Web App（步驟 11~16）**：
-  - 地區下拉式選單切換（北部地區、中部地區、南部地區、東北部地區、東部地區、東南部地區等）。
-  - 一週最高溫與最低溫互動折線圖（雙線比較、點提示 Tooltip）。
+  - 建立 `data.db` 資料庫，包含課程規範之 `TemperatureForecasts` 表與擴充之 `CountyForecasts` 表。
+  - 設計 `UNIQUE` 約束與 `INSERT OR REPLACE` 機制，確保重複執行時不重複插入資料。
+- **🗺️ 地圖放大與分區縣市下鑽（進階優化）**：
+  - **全台宏觀模式**：一覽全台各大地理分區之氣候分佈。
+  - **分區深入模式（Zoom In）**：點選任一分區（例如「中部地區」），地圖自動平移放大，切換呈現該分區轄下各縣市（臺中市、彰化縣、南投縣、雲林縣、嘉義市、嘉義縣）的標記、天氣圖示、氣溫指標與橫向對比圖表。
+  - 提供快捷「🔙 返回全台總覽」按鈕。
+- **Streamlit 視覺化 Web App（步驟 11~19）**：
+  - 一週最高溫與最低溫互動折線圖（支援分區與個別縣市維度切換）。
   - 詳細數據表格與統計指標小卡（本週最高溫、最低溫、平均溫、日溫差）。
-- **Folium 台灣地圖視覺化（步驟 17~19）**：
-  - 日期選擇切換器：動態觀察指定日期的全台氣溫分佈。
-  - 氣溫分級著色標記：
-    - 🔵 `< 20°C`（寒冷/涼爽）
-    - 🟢 `20°C ~ 25°C`（舒適宜人）
-    - 🟠 `25°C ~ 30°C`（溫暖偏熱）
-    - 🔴 `> 30°C`（炎熱高溫）
-  - 互動 Popup：點擊地圖標記即時顯示分區名稱、預報最高溫、最低溫與平均溫。
+  - 氣溫四級顏色視覺化（藍 <20°C、綠 20~25°C、橘 25~30°C、紅 >30°C）。
 
 ---
 
 ## 🗄️ 資料庫設計 (Database Schema)
 
-資料庫檔案名稱：`data.db`  
-資料表名稱：`TemperatureForecasts`
+資料庫檔案名稱：`data.db`
 
+### 1. 分區預報資料表（課程標準）
 ```sql
 CREATE TABLE IF NOT EXISTS TemperatureForecasts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,6 +38,20 @@ CREATE TABLE IF NOT EXISTS TemperatureForecasts (
     mint REAL NOT NULL,
     maxt REAL NOT NULL,
     UNIQUE(regionName, dataDate)
+);
+```
+
+### 2. 縣市細部預報資料表（下鑽放大功能使用）
+```sql
+CREATE TABLE IF NOT EXISTS CountyForecasts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    countyName TEXT NOT NULL,
+    regionName TEXT NOT NULL,
+    dataDate TEXT NOT NULL,
+    mint REAL NOT NULL,
+    maxt REAL NOT NULL,
+    weatherDesc TEXT,
+    UNIQUE(countyName, dataDate)
 );
 ```
 
@@ -56,7 +68,7 @@ pip install -r requirements.txt
 ```powershell
 python fetch_data.py
 ```
-> 執行完畢後會自動於根目錄產出 `data.db`，並在終端機輸出 SQL 驗證結果。
+> 執行完畢後會自動於根目錄產出 `data.db`，並在終端機輸出抓取與寫入筆數。
 
 ### 3. 啟動 Streamlit 互動 Web 應用
 ```powershell
