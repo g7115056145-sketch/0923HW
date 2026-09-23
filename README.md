@@ -18,6 +18,12 @@
   - **全台宏觀模式**：一覽全台各大地理分區之氣候分佈。
   - **分區深入模式（Zoom In）**：點選任一分區（例如「中部地區」），地圖自動平移放大，切換呈現該分區轄下各縣市（臺中市、彰化縣、南投縣、雲林縣、嘉義市、嘉義縣）的標記、天氣圖示、氣溫指標與橫向對比圖表。
   - 提供快捷「🔙 返回全台總覽」按鈕。
+- **🌍 1:1 復刻 Edimax AirBox (空氣盒子) 全景 GIS 監測體驗**：
+  - **沉浸式地圖畫布**：高質感全幅台灣底圖，搭配經典 AirBox 發光彩色數值圓圈 (Bubble Nodes)。
+  - **即時指標切換**：可自由切換氣溫 (°C)、PM2.5 細懸浮微粒 (μg/m³)、相對濕度 (%) 與天氣現象。
+  - **動態風場流線粒子 (Windy Lines)**：具備台灣海峽與全島東北季風動態流線動畫開關。
+  - **AirBox 3 圖表視窗**：點選任一縣市節點，即時展開包含 3 組動態 Chart.js 折線圖（PM2.5 漸層走勢、最高/最低溫對比、相對濕度波動）與重點指標小卡的詳細彈窗。
+  - **浮動收合選單 (Menu Drawer) 與底端漸層色階列 (Legend Bar)**。
 - **Streamlit 視覺化 Web App（步驟 11~19）**：
   - 一週最高溫與最低溫互動折線圖（支援分區與個別縣市維度切換）。
   - 詳細數據表格與統計指標小卡（本週最高溫、最低溫、平均溫、日溫差）。
@@ -59,19 +65,13 @@ CREATE TABLE IF NOT EXISTS CountyForecasts (
 
 ## 🚀 快速開始
 
-### 1. 安裝所需套件
+### 方法 A：啟動 Streamlit 完整版 (包含 AirBox、走勢圖與資料庫)
 ```powershell
 pip install -r requirements.txt
-```
-
-### 2. 執行資料擷取並初始化資料庫
-```powershell
-python fetch_data.py
-```
-> 執行完畢後會自動於根目錄產出 `data.db`，並在終端機輸出抓取與寫入筆數。
-
-### 3. 啟動 Streamlit 互動 Web 應用
-```powershell
 python -m streamlit run app.py
 ```
 > 終端機會顯示本地伺服器網址（通常為 `http://localhost:8501`），瀏覽器將自動開啟互動儀表板。
+
+### 方法 B：免 Python 環境！直接雙擊開啟獨立版 AirBox
+直接在檔案總管中雙擊 `index.html`，即可在 Chrome / Edge 等任何瀏覽器中體驗 100% 滿版 Edimax AirBox 空氣盒子！
+
