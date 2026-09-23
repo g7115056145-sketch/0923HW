@@ -251,12 +251,21 @@ def main():
                     st.session_state["current_view_region"] = "全台總覽"
                     st.rerun()
 
-        # 建立 Folium 地圖物件
+        # 建立 Folium 地圖物件：設定邊界約束與縮放級距，完全鎖定在台灣範圍內
         m = folium.Map(
             location=cfg["center"],
             zoom_start=cfg["zoom"],
+            min_zoom=7,
+            max_zoom=13,
+            max_bounds=True,
+            min_lat=21.3,
+            max_lat=26.5,
+            min_lon=117.8,
+            max_lon=122.8,
             tiles="OpenStreetMap"
         )
+        # 設定邊界黏滯度為 1.0 (完全硬邊界，無法拖曳離開台灣)
+        m.options["maxBoundsViscosity"] = 1.0
 
         # 判斷當前模式：全台總覽 vs 分區深入下鑽
         if active_view == "全台總覽":
