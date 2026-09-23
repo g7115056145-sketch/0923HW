@@ -255,7 +255,7 @@ def main():
         m = folium.Map(
             location=cfg["center"],
             zoom_start=cfg["zoom"],
-            tiles="CartoDB positron"
+            tiles="OpenStreetMap"
         )
 
         # 判斷當前模式：全台總覽 vs 分區深入下鑽
